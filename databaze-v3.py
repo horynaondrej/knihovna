@@ -87,9 +87,31 @@ class Databaze:
     def generovani(self):
         ''' Metoda pro generování nákupů a prodejů
         '''
+
+        for i in range(1, 10):
+            nakup = self.generuj_nakup()
+            self.nakupy.append(nakup)
     
         i = 0
         while True:
+
+            """
+            Když je datum 1.4.2024 tak se začne generovat nákup
+            
+            Tento den se objedná n počet knih.
+
+            Tyto knihy přidá do seznamu nakupu a vytvoří 
+            exempláře.
+
+            V tento den se pak začne i generovat prodej,
+            náhodný počet prodaných knih
+
+            V další den se bude dělat nákup, pouze, když
+            je hodnota neprodaných knih > n
+
+            To je celkem zajímavé :)
+
+            """
 
             # Nalezení exempláře knihy na skladě
             exemplar = self.najdi_exemplar()
