@@ -153,6 +153,8 @@ def main():
 
     To je celkem zajímavé :)
 
+    Zase něco dalšího..
+
     """
 
     d = Databaze()
