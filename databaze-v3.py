@@ -122,12 +122,14 @@ def main():
     """
     Když je datum 1.4.2024 tak se začne generovat nákup
     
-    Tento den se například objedná n počet knih.
-    V tento den se pak začne i generovat i prodej,
+    Tento den se objedná n počet knih.
+    V tento den se pak začne i generovat prodej,
     náhodný počet prodaných knih
 
     V další den se bude dělat nákup, pouze, když
     je hodnota neprodaných knih > n
+
+    To je celkem zajímavé :)
 
     """
 
