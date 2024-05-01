@@ -154,6 +154,7 @@ def main():
     To je celkem zajímavé :)
 
     Zase něco dalšího..
+    A test 2.
 
     """
 
