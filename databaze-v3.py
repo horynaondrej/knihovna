@@ -5,6 +5,7 @@ import random
 from exemplar import Exemplar
 from nakup import Nakup
 from prodej import Prodej
+from kniha import Kniha
 
 
 class Databaze:
@@ -18,6 +19,7 @@ class Databaze:
         self.exemplar_klic = 1
         self.prodeje = []
         self.nakupy = []
+        self.knihy = []
 
         # Datum začátku provozu sklad knih
         self.datum = datetime.date(2024, 4, 1)
@@ -64,12 +66,12 @@ class Databaze:
         '''
 
         nakupni_cena = 10
-        datum_nakupu = datetime.date.today()
+        datum_nakupu = self.datum
         kod = f'KOD{self.exemplar_klic + 1:03d}'
         exemplar = Exemplar(
                 self.exemplar_klic, 
                 kod, 
-                1, 
+                random.choices(self.knihy)[0].kniha_id,
                 datum_nakupu.strftime('%Y%m%d'), 
                 None
             )
@@ -91,48 +93,33 @@ class Databaze:
         for i in range(1, 10):
             nakup = self.generuj_nakup()
             self.nakupy.append(nakup)
-    
-        i = 0
-        while True:
 
-            """
-            Když je datum 1.4.2024 tak se začne generovat nákup
-            
-            Tento den se objedná n počet knih.
+        c = 0
+        while c < 10:
+        
+            i = 0
+            while i < 10:
 
-            Tyto knihy přidá do seznamu nakupu a vytvoří 
-            exempláře.
+                # Nalezení exempláře knihy na skladě
+                exemplar = self.najdi_exemplar()
 
-            V tento den se pak začne i generovat prodej,
-            náhodný počet prodaných knih
-
-            V další den se bude dělat nákup, pouze, když
-            je hodnota neprodaných knih > n
-
-            To je celkem zajímavé :)
-
-            """
-
-            # Nalezení exempláře knihy na skladě
-            exemplar = self.najdi_exemplar()
-
-            # Pokud je exemplář na skladě, proveď prodej
-            if exemplar:
-                prodej = self.generuj_prodej(exemplar)
-                self.prodeje.append(prodej)
-                print(f"Prodej: {prodej}")
-                if i == 10:
-                    break
+                # Pokud je exemplář na skladě, proveď prodej
+                if exemplar:
+                    prodej = self.generuj_prodej(exemplar)
+                    self.prodeje.append(prodej)
+                    print(f"Prodej: {prodej}")
                 i += 1
 
             # Pokud exemplář není na skladě, proveď nákup
-            else:
-                a = 0
-                while a < 10:
-                    nakup = self.generuj_nakup()
-                    self.nakupy.append(nakup)
-                    print(f"Nákup: {nakup}")
-                    a += 1
+            a = 0
+            while a < 10:
+                nakup = self.generuj_nakup()
+                self.nakupy.append(nakup)
+                print(f"Nákup: {nakup}")
+                a += 1
+
+            self.datum = self.datum + datetime.timedelta(days=1)
+            c += 1
 
 # Hlavní metoda skriptu
 def main():
@@ -141,24 +128,15 @@ def main():
 
     logging.info('Spuštění skriptu')
 
-    """
-    Když je datum 1.4.2024 tak se začne generovat nákup
-    
-    Tento den se objedná n počet knih.
-    V tento den se pak začne i generovat prodej,
-    náhodný počet prodaných knih
-
-    V další den se bude dělat nákup, pouze, když
-    je hodnota neprodaných knih > n
-
-    To je celkem zajímavé :)
-
-    Zase něco dalšího..
-    A test 2.
-
-    """
-
     d = Databaze()
+    d.knihy.append(Kniha(1, 1, 1, 'Linux příkazy', 900, 2004))
+    d.knihy.append(Kniha(2, 2, 2, 'Windows 10 průvodce', 750, 2010))
+    d.knihy.append(Kniha(3, 3, 2, 'MSSQL mistrovství', 600, 2012))
+    d.knihy.append(Kniha(4, 4, 3, 'Python 3.11', 720, 2020))
+    d.knihy.append(Kniha(5, 5, 4, 'Excel 2013', 1000, 2013))
+    d.knihy.append(Kniha(6, 6, 5, 'C#', 297, 2008))
+    d.knihy.append(Kniha(7, 7, 6, 'Powershell', 502, 2022))
+    d.knihy.append(Kniha(8, 8, 7, 'HTML 5 a CSS 3', 502, 2022))
     d.generovani()
     
     print(f'Celkový výpis databáze')
