@@ -6,6 +6,8 @@ from exemplar import Exemplar
 from nakup import Nakup
 from prodej import Prodej
 from kniha import Kniha
+from spisovatel import Spisovatel
+from zamestnanec import Zamestnanec
 
 
 class Databaze:
@@ -20,6 +22,7 @@ class Databaze:
         self.prodeje = []
         self.nakupy = []
         self.knihy = []
+        self.zamestnanci = []
 
         # Datum začátku provozu sklad knih
         self.datum = datetime.date(2024, 4, 1)
@@ -52,7 +55,8 @@ class Databaze:
         prodej = Prodej(
             self.prodej_klic, 
             datum_prodeje.strftime('%Y%m%d'), 
-            exemplar.klic, 
+            exemplar.klic,
+            random.choices(self.zamestnanci)[0].zamestnanec_id, 
             prodejni_cena
         )
         exemplar.prodani = datum_prodeje.strftime('%Y%m%d')
@@ -129,14 +133,24 @@ def main():
     logging.info('Spuštění skriptu')
 
     d = Databaze()
+
+    d.spisovatele.append(Spisovatel(1, 1, 'Novák', 'Jan'))
+    d.spisovatele.append(Spisovatel(2, 2, 'Svoboda', 'Petr'))
+    d.spisovatele.append(Spisovatel(3, 3, 'Malý', 'Jiří'))
+    d.spisovatele.append(Spisovatel(4, 4, 'Zelený', 'Karel'))
+
     d.knihy.append(Kniha(1, 1, 1, 'Linux příkazy', 900, 2004))
     d.knihy.append(Kniha(2, 2, 2, 'Windows 10 průvodce', 750, 2010))
     d.knihy.append(Kniha(3, 3, 2, 'MSSQL mistrovství', 600, 2012))
     d.knihy.append(Kniha(4, 4, 3, 'Python 3.11', 720, 2020))
     d.knihy.append(Kniha(5, 5, 4, 'Excel 2013', 1000, 2013))
-    d.knihy.append(Kniha(6, 6, 5, 'C#', 297, 2008))
-    d.knihy.append(Kniha(7, 7, 6, 'Powershell', 502, 2022))
-    d.knihy.append(Kniha(8, 8, 7, 'HTML 5 a CSS 3', 502, 2022))
+    d.knihy.append(Kniha(6, 6, 1, 'C#', 297, 2008))
+    d.knihy.append(Kniha(7, 7, 1, 'Powershell', 502, 2022))
+    d.knihy.append(Kniha(8, 8, 4, 'HTML 5 a CSS 3', 502, 2022))
+
+    d.zamestnanci.append(Zamestnanec(1, 1, 'Kouba', 'František'))
+    d.zamestnanci.append(Zamestnanec(2, 2, 'Pokorná', 'Simona'))
+    
     d.generovani()
     
     print(f'Celkový výpis databáze')
