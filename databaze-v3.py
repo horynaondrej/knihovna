@@ -150,6 +150,8 @@ def main():
 
     d.zamestnanci.append(Zamestnanec(1, 1, 'Kouba', 'František'))
     d.zamestnanci.append(Zamestnanec(2, 2, 'Pokorná', 'Simona'))
+
+    # Test
     
     d.generovani()
     
