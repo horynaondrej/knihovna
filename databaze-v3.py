@@ -8,6 +8,7 @@ from prodej import Prodej
 from kniha import Kniha
 from spisovatel import Spisovatel
 from zamestnanec import Zamestnanec
+from zakaznik import Zakaznik
 
 
 class Databaze:
@@ -151,7 +152,10 @@ def main():
     d.zamestnanci.append(Zamestnanec(1, 1, 'Kouba', 'František'))
     d.zamestnanci.append(Zamestnanec(2, 2, 'Pokorná', 'Simona'))
 
-    # Test 2
+    d.zakaznici.append(Zakaznik(1, 1, 'Svobodová', 'Marie', 'Valašské Meziříčí', 545058, 'K Hrušovu', 73, 83407))
+    d.zakaznici.append(Zakaznik(2, 2, 'Kučera', 'Jakub', 'Teplice', 567442, 'Do Vršku', 47, 72981))
+    d.zakaznici.append(Zakaznik(3, 3, 'Němcová', 'Hana', 'null', 'null', 'null', 'null', 'null'))
+    d.zakaznici.append(Zakaznik(4, 4, 'Němcová', 'Petra', 'Jablonec nad Nisou', 563510, 'Statková', 2, 36734))
     
     d.generovani()
     
