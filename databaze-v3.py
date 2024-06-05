@@ -2,6 +2,7 @@
 import logging 
 import datetime
 import random
+import os
 from exemplar import Exemplar
 from nakup import Nakup
 from prodej import Prodej
@@ -16,6 +17,9 @@ class Databaze:
     '''
 
     def __init__(self):
+
+        self.cesta = os.path.dirname(__file__)
+
         self.exemplare = []
         self.prodej_klic = 1
         self.nakup_klic = 1
@@ -24,9 +28,24 @@ class Databaze:
         self.nakupy = []
         self.knihy = []
         self.zamestnanci = []
+        self.spisovatele = []
+        self.zakaznici = []
 
         # Datum začátku provozu sklad knih
         self.datum = datetime.date(2024, 4, 1)
+
+    def zapis_do_csv_souboru(self, hla, tab, n) -> None:
+        """ Metoda zapíše data do souboru jako CSV.
+        Pouze pro jenoduchý formáté
+        """
+        nazev = os.path.join(self.cesta, n)
+
+        # Uložení do souboru
+        with open(nazev, 'w', encoding='utf8') as s:
+            s.write(hla + '\n')
+            for nty in tab:
+                s.write(str(nty.format_csv()) + '\n')
+        logging.info(f'Zápis souboru {n} proběhl v pořádku')
 
     def najdi_exemplar(self):
         ''' Funkce pro nalezení exempláře knihy
@@ -57,6 +76,7 @@ class Databaze:
             self.prodej_klic, 
             datum_prodeje.strftime('%Y%m%d'), 
             exemplar.klic,
+            random.choices(self.zakaznici)[0].zakaznik_id, 
             random.choices(self.zamestnanci)[0].zamestnanec_id, 
             prodejni_cena
         )
@@ -86,6 +106,7 @@ class Databaze:
                 self.nakup_klic, 
                 datum_nakupu.strftime('%Y%m%d'), 
                 exemplar.klic, 
+                random.choices(self.zamestnanci)[0].zamestnanec_id,
                 nakupni_cena
             )
         self.exemplar_klic += 1
@@ -131,6 +152,10 @@ def main():
 
     logging.basicConfig(level=logging.INFO)
 
+    # TODO: upravit exemplář třída
+
+    
+
     logging.info('Spuštění skriptu')
 
     d = Databaze()
@@ -162,6 +187,13 @@ def main():
     print(f'Celkový výpis databáze')
     for i in d.exemplare:
         print(i)
+
+    # d.zapis_do_csv_souboru('klic;zakaznik_id;prijmeni;jmeno;mesto;mesto_kod;ulice;cislo;psc',d.zakaznici, 'zakaznici.txt')
+    # d.zapis_do_csv_souboru('klic;zamestnanec_id;prijmeni;jmeno', d.zamestnanci, 'zamestnanci.txt')
+    # d.zapis_do_csv_souboru('klic;spisovatel_id;prijmeni;jmeno', d.spisovatele, 'spisovatele.txt')
+    # d.zapis_do_csv_souboru('klic;kniha_id;spisovatel_id;nazev;rok_vydani', d.knihy, 'knihy.txt')
+    d.zapis_do_csv_souboru('klic;datum_naskladneni_klic;exemplar_id;zamestnanec_id;cena', d.nakupy, 'nakupy.txt')
+    d.zapis_do_csv_souboru('klic;datum_prodeje_klic;exemplar_id;zakaznik_id;zamestnanec_id;cena', d.prodeje, 'prodeje.txt')
 
     logging.info('Ukončení skriptu')
 
