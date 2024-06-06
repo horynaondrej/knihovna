@@ -1,0 +1,9 @@
+klic;kniha_id;spisovatel_id;nazev;rok_vydani
+1;1;1;Linux příkazy;2004
+2;2;2;Windows 10 průvodce;2010
+3;3;2;MSSQL mistrovství;2012
+4;4;3;Python 3.11;2020
+5;5;4;Excel 2013;2013
+6;6;1;C#;2008
+7;7;1;Powershell;2022
+8;8;4;HTML 5 a CSS 3;2022

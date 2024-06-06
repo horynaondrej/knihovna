@@ -25,3 +25,12 @@ class Exemplar:
         f'Kniha: {self.kniha_id}, ' \
         f'Nakoupeni: {self.nakoupeni}, ' \
         f'Prodání: {self.prodani}'
+
+    def format_csv(self):
+        return (
+            str(self.klic) + ';'
+            + str(self.kod) + ';'
+            + str(self.kniha_id) + ';'
+            + str(self.nakoupeni) + ';'
+            + str(self.prodani)
+            )
