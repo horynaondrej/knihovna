@@ -9,14 +9,12 @@ class Kniha:
             kniha_id, 
             spisovatel_id, 
             nazev, 
-            cena, 
             rok_vydani
         ):
         self.klic = klic
         self.kniha_id = kniha_id
         self.spisovatel_id = spisovatel_id
         self.nazev = nazev
-        self.cena = cena
         self.rok_vydani = rok_vydani
 
     def format_sql(self):
@@ -25,7 +23,6 @@ class Kniha:
             + str(self.kniha_id) + ', ' \
             + str(self.spisovatel_id) + ', ' \
             +  '\'' + self.nazev + '\', ' \
-            + str(self.cena) + ', ' \
             + str(self.rok_vydani) + '),'
             )
 
@@ -35,6 +32,5 @@ class Kniha:
             + str(self.kniha_id) + ';' \
             + str(self.spisovatel_id) + ';' \
             + self.nazev + ';' \
-            + str(self.cena) + ';' \
             + str(self.rok_vydani)
             )

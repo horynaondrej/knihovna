@@ -59,6 +59,40 @@ class Databaze:
                 return exemplar
         return None
     
+    def cenik_knih(self) -> dict:
+        """Funkce vrací seznam ceny knih
+        
+        Return:
+            ceny: slovník 
+        """
+
+        return {
+            1: 850,
+            2: 350,
+            3: 720,
+            4: 745,
+            5: 900,
+            6: 1200,
+            7: 280,
+            8: 460
+        } 
+      
+    def nalezni_cenu_nakupu(self, kniha_id: int) -> int:
+        """ Funkce nalezne cenu z ceníku
+
+        """
+       
+        ceny = self.cenik_knih()
+
+        return ceny.get(kniha_id)
+    
+    def najdi_cenu_prodeje(self, exemplar: int) -> int:
+        """ Funkce nalezne cenu nakoupené knihy a vrátí 
+        její cenu 
+
+        """
+           
+    
     def generuj_prodej(self, exemplar):
         ''' Funkce pro generování záznamu o prodeji
 
@@ -70,7 +104,7 @@ class Databaze:
             Upravuje datum prodeje exempláře
         '''
 
-        prodejni_cena = 12
+        prodejni_cena = 10 * 0.2
         datum_prodeje = self.datum + datetime.timedelta(days=1)
         prodej = Prodej(
             self.prodej_klic, 
@@ -90,18 +124,28 @@ class Databaze:
         ''' Funkce pro generování záznamu o nákupu
         '''
 
-        nakupni_cena = 10
         datum_nakupu = self.datum
         kod = f'KOD{self.exemplar_klic + 1:03d}'
+        
+
+        # Cena se musí určit ještě před tím, než se vytvoří nový záznam
+        # o nákupu nové knihy
+        kniha_id_temp = random.choices(self.knihy)[0].kniha_id
+        nakupni_cena = self.nalezni_cenu_nakupu(kniha_id_temp)
+
+        # Nový exemplář
         exemplar = Exemplar(
                 self.exemplar_klic, 
                 kod, 
-                random.choices(self.knihy)[0].kniha_id,
+                kniha_id_temp,
                 datum_nakupu.strftime('%Y%m%d'), 
                 None
             )
+
         self.exemplare.append(exemplar)
+        
         print(f'Exemplář: {exemplar}')
+        
         nakup = Nakup(
                 self.nakup_klic, 
                 datum_nakupu.strftime('%Y%m%d'), 
@@ -124,6 +168,8 @@ class Databaze:
         while c < 10:
         
             i = 0
+
+            # Provádí n počet prodejů
             while i < 10:
 
                 # Nalezení exempláře knihy na skladě
@@ -138,6 +184,8 @@ class Databaze:
 
             # Pokud exemplář není na skladě, proveď nákup
             a = 0
+
+            # Proveď n počet nákupů, do zásoby
             while a < 10:
                 nakup = self.generuj_nakup()
                 self.nakupy.append(nakup)
@@ -147,14 +195,16 @@ class Databaze:
             self.datum = self.datum + datetime.timedelta(days=1)
             c += 1
 
+            # Když je datum dnes, ukonči veškerou činnost
+            if self.datum == datetime.date.today():
+                return
+
 # Hlavní metoda skriptu
 def main():
 
     logging.basicConfig(level=logging.INFO)
 
     # TODO: upravit exemplář třída
-
-    
 
     logging.info('Spuštění skriptu')
 
@@ -165,14 +215,14 @@ def main():
     d.spisovatele.append(Spisovatel(3, 3, 'Malý', 'Jiří'))
     d.spisovatele.append(Spisovatel(4, 4, 'Zelený', 'Karel'))
 
-    d.knihy.append(Kniha(1, 1, 1, 'Linux příkazy', 900, 2004))
-    d.knihy.append(Kniha(2, 2, 2, 'Windows 10 průvodce', 750, 2010))
-    d.knihy.append(Kniha(3, 3, 2, 'MSSQL mistrovství', 600, 2012))
-    d.knihy.append(Kniha(4, 4, 3, 'Python 3.11', 720, 2020))
-    d.knihy.append(Kniha(5, 5, 4, 'Excel 2013', 1000, 2013))
-    d.knihy.append(Kniha(6, 6, 1, 'C#', 297, 2008))
-    d.knihy.append(Kniha(7, 7, 1, 'Powershell', 502, 2022))
-    d.knihy.append(Kniha(8, 8, 4, 'HTML 5 a CSS 3', 502, 2022))
+    d.knihy.append(Kniha(1, 1, 1, 'Linux příkazy', 2004))
+    d.knihy.append(Kniha(2, 2, 2, 'Windows 10 průvodce', 2010))
+    d.knihy.append(Kniha(3, 3, 2, 'MSSQL mistrovství', 2012))
+    d.knihy.append(Kniha(4, 4, 3, 'Python 3.11', 2020))
+    d.knihy.append(Kniha(5, 5, 4, 'Excel 2013', 2013))
+    d.knihy.append(Kniha(6, 6, 1, 'C#', 2008))
+    d.knihy.append(Kniha(7, 7, 1, 'Powershell', 2022))
+    d.knihy.append(Kniha(8, 8, 4, 'HTML 5 a CSS 3', 2022))
 
     d.zamestnanci.append(Zamestnanec(1, 1, 'Kouba', 'František'))
     d.zamestnanci.append(Zamestnanec(2, 2, 'Pokorná', 'Simona'))
@@ -181,6 +231,10 @@ def main():
     d.zakaznici.append(Zakaznik(2, 2, 'Kučera', 'Jakub', 'Teplice', 567442, 'Do Vršku', 47, 72981))
     d.zakaznici.append(Zakaznik(3, 3, 'Němcová', 'Hana', 'null', 'null', 'null', 'null', 'null'))
     d.zakaznici.append(Zakaznik(4, 4, 'Němcová', 'Petra', 'Jablonec nad Nisou', 563510, 'Statková', 2, 36734))
+    d.zakaznici.append(Zakaznik(5, 5, 'Procházková', 'Zdeňka', 'Havířov', 555088, 'K samotě', 56, 68125))
+    d.zakaznici.append(Zakaznik(6, 6, 'Pospíšilová', 'Jana', 'null', 'null', 'null', 'null', 'null'))
+    d.zakaznici.append(Zakaznik(7, 7, 'Marková', 'Jana', 'Kroměříž', 588296, 'Pavlišovská', 4, 76701))
+    d.zakaznici.append(Zakaznik(8, 8, 'Veselá', 'Stanislava', 'null', 'null', 'null', 'null', 'null'))
     
     d.generovani()
     
@@ -188,10 +242,11 @@ def main():
     for i in d.exemplare:
         print(i)
 
-    # d.zapis_do_csv_souboru('klic;zakaznik_id;prijmeni;jmeno;mesto;mesto_kod;ulice;cislo;psc',d.zakaznici, 'zakaznici.txt')
-    # d.zapis_do_csv_souboru('klic;zamestnanec_id;prijmeni;jmeno', d.zamestnanci, 'zamestnanci.txt')
-    # d.zapis_do_csv_souboru('klic;spisovatel_id;prijmeni;jmeno', d.spisovatele, 'spisovatele.txt')
-    # d.zapis_do_csv_souboru('klic;kniha_id;spisovatel_id;nazev;rok_vydani', d.knihy, 'knihy.txt')
+    d.zapis_do_csv_souboru('klic;zakaznik_id;prijmeni;jmeno;mesto;mesto_kod;ulice;cislo;psc',d.zakaznici, 'zakaznici.txt')
+    d.zapis_do_csv_souboru('klic;zamestnanec_id;prijmeni;jmeno', d.zamestnanci, 'zamestnanci.txt')
+    d.zapis_do_csv_souboru('klic;spisovatel_id;prijmeni;jmeno', d.spisovatele, 'spisovatele.txt')
+    d.zapis_do_csv_souboru('klic;kniha_id;spisovatel_id;nazev;rok_vydani', d.knihy, 'knihy.txt')
+    d.zapis_do_csv_souboru('klic;kod;kniha_id;nakoupeni;prodani', d.exemplare, 'exemplare.txt')
     d.zapis_do_csv_souboru('klic;datum_naskladneni_klic;exemplar_id;zamestnanec_id;cena', d.nakupy, 'nakupy.txt')
     d.zapis_do_csv_souboru('klic;datum_prodeje_klic;exemplar_id;zakaznik_id;zamestnanec_id;cena', d.prodeje, 'prodeje.txt')
 
