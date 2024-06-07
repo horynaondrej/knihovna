@@ -89,9 +89,35 @@ class Databaze:
     def najdi_cenu_prodeje(self, exemplar: int) -> int:
         """ Funkce nalezne cenu nakoupené knihy a vrátí 
         její cenu 
-
         """
-           
+
+        print(f'Exemplář dohledávám: {exemplar}')
+        print(f'Pole exemplářů: {self.exemplare}')
+
+        for nty in self.exemplare:
+            if exemplar.klic == nty.klic:
+
+                kniha_index = nty.kniha_id
+
+        return self.cenik_knih().get(kniha_index)
+    
+    def nahodne_vahy(self, delka):
+        """ Funkce vrací indexy pro výběr jen části pole
+        """
+        start = random.randint(0, delka)
+        konec = random.randint(0, delka)
+
+        # Když se čísla rovnají, vygeneruje se jiné
+        # Když je rozdíl menší než 20, vygeneruje se jiné
+        while start == konec or abs(start - konec) < 4:
+            konec = random.randint(0, delka)
+
+        # Když je start větší než konec, vrací se 
+        # indexy v obráceném pořadí
+        if start > konec:
+            return konec, start
+        else:
+            return start, konec
     
     def generuj_prodej(self, exemplar):
         ''' Funkce pro generování záznamu o prodeji
@@ -104,18 +130,24 @@ class Databaze:
             Upravuje datum prodeje exempláře
         '''
 
-        prodejni_cena = 10 * 0.2
+        # Upravení váhy výběru náhodné knihy
+        vahy_zakaznici = [0] * len(self.zakaznici)
+        print(vahy_zakaznici)
+        zacatek, konec = self.nahodne_vahy(len(self.zakaznici))
+        vahy_zakaznici[zacatek:konec] = [50] * (konec - zacatek)
+
+        prodejni_cena = self.najdi_cenu_prodeje(exemplar)
         datum_prodeje = self.datum + datetime.timedelta(days=1)
         prodej = Prodej(
             self.prodej_klic, 
             datum_prodeje.strftime('%Y%m%d'), 
             exemplar.klic,
-            random.choices(self.zakaznici)[0].zakaznik_id, 
+            random.choices(self.zakaznici, weights=vahy_zakaznici, k=1)[0].zakaznik_id, 
             random.choices(self.zamestnanci)[0].zamestnanec_id, 
             prodejni_cena
         )
         exemplar.prodani = datum_prodeje.strftime('%Y%m%d')
-        print(f'Exemplář: {exemplar}')
+        # print(f'Exemplář: {exemplar}')
         
         self.prodej_klic += 1
         return prodej
@@ -126,7 +158,6 @@ class Databaze:
 
         datum_nakupu = self.datum
         kod = f'KOD{self.exemplar_klic + 1:03d}'
-        
 
         # Cena se musí určit ještě před tím, než se vytvoří nový záznam
         # o nákupu nové knihy
@@ -144,7 +175,7 @@ class Databaze:
 
         self.exemplare.append(exemplar)
         
-        print(f'Exemplář: {exemplar}')
+        # print(f'Exemplář: {exemplar}')
         
         nakup = Nakup(
                 self.nakup_klic, 
@@ -153,6 +184,7 @@ class Databaze:
                 random.choices(self.zamestnanci)[0].zamestnanec_id,
                 nakupni_cena
             )
+        self.nakup_klic += 1
         self.exemplar_klic += 1
         return nakup
 
@@ -163,14 +195,15 @@ class Databaze:
         for i in range(1, 10):
             nakup = self.generuj_nakup()
             self.nakupy.append(nakup)
+            print(f"Nákup: {nakup}")
 
         c = 0
-        while c < 10:
+        while c < 2:
         
             i = 0
 
             # Provádí n počet prodejů
-            while i < 10:
+            while i < 2:
 
                 # Nalezení exempláře knihy na skladě
                 exemplar = self.najdi_exemplar()
@@ -186,7 +219,7 @@ class Databaze:
             a = 0
 
             # Proveď n počet nákupů, do zásoby
-            while a < 10:
+            while a < 2:
                 nakup = self.generuj_nakup()
                 self.nakupy.append(nakup)
                 print(f"Nákup: {nakup}")
@@ -237,10 +270,6 @@ def main():
     d.zakaznici.append(Zakaznik(8, 8, 'Veselá', 'Stanislava', 'null', 'null', 'null', 'null', 'null'))
     
     d.generovani()
-    
-    print(f'Celkový výpis databáze')
-    for i in d.exemplare:
-        print(i)
 
     d.zapis_do_csv_souboru('klic;zakaznik_id;prijmeni;jmeno;mesto;mesto_kod;ulice;cislo;psc',d.zakaznici, 'zakaznici.txt')
     d.zapis_do_csv_souboru('klic;zamestnanec_id;prijmeni;jmeno', d.zamestnanci, 'zamestnanci.txt')
