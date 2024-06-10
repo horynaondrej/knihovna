@@ -32,5 +32,5 @@ class Exemplar:
             + str(self.kod) + ';'
             + str(self.kniha_id) + ';'
             + str(self.nakoupeni) + ';'
-            + str(self.prodani)
+            + str(self.prodani if self.prodani is not None else '')
             )
