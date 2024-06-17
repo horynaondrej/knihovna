@@ -1,9 +1,9 @@
 klic;zakaznik_id;prijmeni;jmeno;mesto;mesto_kod;ulice;cislo;psc
 1;1;Svobodová;Marie;Valašské Meziříčí;545058;K Hrušovu;73;83407
 2;2;Kučera;Jakub;Teplice;567442;Do Vršku;47;72981
-3;3;Němcová;Hana;null;null;null;null;null
+3;3;Němcová;Hana;;;;;
 4;4;Němcová;Petra;Jablonec nad Nisou;563510;Statková;2;36734
 5;5;Procházková;Zdeňka;Havířov;555088;K samotě;56;68125
-6;6;Pospíšilová;Jana;null;null;null;null;null
+6;6;Pospíšilová;Jana;;;;;
 7;7;Marková;Jana;Kroměříž;588296;Pavlišovská;4;76701
-8;8;Veselá;Stanislava;null;null;null;null;null
+8;8;Veselá;Stanislava;;;;;
