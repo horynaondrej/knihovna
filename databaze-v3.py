@@ -3,6 +3,8 @@ import logging
 import datetime
 import random
 import os
+import cProfile
+import pstats
 from exemplar import Exemplar
 from nakup import Nakup
 from prodej import Prodej
@@ -20,7 +22,8 @@ class Databaze:
 
         self.cesta = os.path.dirname(__file__)
 
-        self.exemplare = []
+        self.exemplare: list[Exemplar] = []
+        self.exemplare_k_prodeji: list[Exemplar] = []
         self.prodej_klic = 1
         self.nakup_klic = 1
         self.exemplar_klic = 1
@@ -46,26 +49,36 @@ class Databaze:
             for nty in tab:
                 s.write(str(nty.format_csv()) + '\n')
         logging.info(f'Zápis souboru {n} proběhl v pořádku')
-
-    def najdi_exemplar(self):
+    """
+    def najdi_exemplar(self) -> Exemplar:
         ''' Funkce pro nalezení exempláře knihy
 
         Return:
             Exemplar: obj
         '''
-
         for exemplar in self.exemplare:
             if exemplar.prodani is None:
                 return exemplar
         return None
-      
+    """
+
+    def najdi_exemplar(self) -> Exemplar:
+        ''' Funkce pro nalezení exempláře knihy
+
+        Return:
+            Exemplar: obj
+        '''
+        # print(self.exemplare_k_prodeji)
+        if len(self.exemplare_k_prodeji) == 0:
+            return None
+        return self.exemplare_k_prodeji.pop(0)
+
     def nalezni_cenu_nakupu(self, kniha_id: int) -> int:
         """ Funkce nalezne cenu z ceníku
         """
-
         return self.knihy[kniha_id - 1].cena
     
-    def najdi_cenu_prodeje(self, exemplar: int) -> int:
+    def najdi_cenu_prodeje(self, exemplar: Exemplar) -> int:
         """ Funkce nalezne cenu nakoupené knihy a vrátí 
         její cenu
 
@@ -78,11 +91,8 @@ class Databaze:
 
         # print(f'Exemplář dohledávám: {exemplar}')
         # print(f'Pole exemplářů: {self.exemplare}')
-
-        for nty in self.exemplare:
-            if exemplar.klic == nty.klic:
-                return self.knihy[nty.kniha_id - 1].cena
-        return 0
+    
+        return self.knihy[exemplar.kniha_id - 1].cena
     
     def nahodne_vahy(self, delka):
         """ Funkce vrací indexy pro výběr jen části pole
@@ -127,6 +137,7 @@ class Databaze:
             datum_prodeje.strftime('%Y%m%d'),
             exemplar.klic,
             random.choices(self.zakaznici, weights=vahy_zakaznici, k=1)[0].zakaznik_id, 
+            # random.choices(self.zakaznici)[0].zakaznik_id, 
             random.choices(self.zamestnanci)[0].zamestnanec_id, 
             prodejni_cena
         )
@@ -174,29 +185,43 @@ class Databaze:
         self.exemplar_klic += 1
 
         return exemplar, nakup
+    
+    def stav_procesu(self, pocet: int) -> None:
+        """ Funkce vypíše do konzole stav iterace
+        """
+        krok = 1000
+        if (pocet % krok == 0):
+            print(f'Index: {pocet}, Dělení: {round(pocet / 1000, 4)}, Modulo: {pocet % 1000}')
 
     def generovani(self) -> None:
         ''' Metoda pro generování nákupů a prodejů
         '''
+        pocet_nakupu: int = 0
+        pocet_prodeju: int = 0
+
+        print(f'Počáteční datum: {self.datum}')
 
         # Generování počátečního počtu exemplářů na sklad
-        for i in range(1, 10):
+        for d in range(1, 10):
             exemplar, nakup = self.generuj_nakup()
             self.exemplare.append(exemplar)
+            self.exemplare_k_prodeji.append(exemplar)
             self.nakupy.append(nakup)
 
             # print(f'Exemplář: {exemplar}')
             # print(f"Nákup: {nakup}")
 
-        c = 0
-        krok = 1000
-        while c < 500000:
-        
-            if (c % krok == 0):
-                print(f'Index: {c}, Dělení: {round(c / 1000, 4)}, Modulo: {c % 1000}')
+        # print(self.exemplare_k_prodeji)
 
+        c = 0
+        while True:
+        
             # Provádí n počet prodejů
-            while i < random.randint(50000, 100000):
+            i = 0
+            nahodny_pocet_prodeju = random.randint(5000, 10000)
+            pocet_prodeju += nahodny_pocet_prodeju
+            
+            while i < nahodny_pocet_prodeju:
 
                 # Nalezení exempláře knihy na skladě
                 exemplar = self.najdi_exemplar()
@@ -210,13 +235,20 @@ class Databaze:
 
                 i += 1
 
+            print(f'Počet prodejů: {pocet_prodeju : <10}')
+
             # Pokud exemplář není na skladě, proveď nákup
             a = 0
 
             # Proveď n počet nákupů, do zásoby
-            while a < random.randint(20, 30):
+            nahodny_pocet_nakupu = random.randint(5000, 10000)
+            pocet_nakupu += nahodny_pocet_nakupu
+            
+            while a < nahodny_pocet_nakupu:
+
                 exemplar, nakup = self.generuj_nakup()
                 self.exemplare.append(exemplar)
+                self.exemplare_k_prodeji.append(exemplar)
                 self.nakupy.append(nakup)
 
                 # print(f'Exemplář: {exemplar}')
@@ -224,12 +256,15 @@ class Databaze:
                 
                 a += 1
 
+            print(f'Počet nákupů: {pocet_nakupu : <10}')
+
             self.datum = self.datum + datetime.timedelta(days=1)
             c += 1
 
+            print(f'Koncové datum: {self.datum}')
             # Když je datum dnes, ukonči veškerou činnost
             if self.datum == datetime.date.today():
-                return
+                break
 
 # Hlavní metoda skriptu
 def main():
@@ -268,7 +303,16 @@ def main():
     d.zakaznici.append(Zakaznik(7, 7, 'Marková', 'Jana', 'Kroměříž', 588296, 'Pavlišovská', 4, 76701))
     d.zakaznici.append(Zakaznik(8, 8, 'Veselá', 'Stanislava', '', '', '', '', ''))
     
+
+    profiler = cProfile.Profile()
+    profiler.enable()
+
     d.generovani()
+
+    profiler.disable()
+    stats = pstats.Stats(profiler).sort_stats('tottime')
+    stats.print_stats()
+
 
     logging.info(f'Počet nákupů: {len(d.nakupy)}')
     logging.info(f'Počet prodejů: {len(d.prodeje)}')
