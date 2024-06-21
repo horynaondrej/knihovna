@@ -14,6 +14,12 @@ from nakladatel import Nakladatel
 from zamestnanec import Zamestnanec
 from zakaznik import Zakaznik
 from kategorie import Kategorie
+from datumy import Datum
+
+
+""" Globální proměnné a konstanty
+"""
+MARZE: float = 1.15
 
 
 class Databaze:
@@ -37,6 +43,7 @@ class Databaze:
         self.zakaznici = []
         self.nakladatele = []
         self.kategorie = []
+        self.datumy = []
 
         # Datum začátku provozu sklad knih
         self.datum = datetime.date(2024, 4, 1)
@@ -133,8 +140,9 @@ class Databaze:
         zacatek, konec = self.nahodne_vahy(len(self.zakaznici))
         vahy_zakaznici[zacatek:konec] = [50] * (konec - zacatek)
 
-        prodejni_cena = self.najdi_cenu_prodeje(exemplar)
-        datum_prodeje = self.datum + datetime.timedelta(days=1)
+        prodejni_cena = round(self.najdi_cenu_prodeje(exemplar) * MARZE, 2)
+        # datum_prodeje = self.datum + datetime.timedelta(days=1)
+        datum_prodeje = self.datum
 
         prodej = Prodej(
             self.prodej_klic, 
@@ -218,6 +226,8 @@ class Databaze:
 
         c = 0
         while True:
+
+            self.datumy.append(Datum(c + 1, self.datum))
         
             # Provádí n počet prodejů
             i = 0
@@ -337,16 +347,6 @@ def main():
     d.zakaznici.append(Zakaznik(6, 6, 'Pospíšilová', 'Jana', 'Pyšely', 538680, 'Mírová', 598, 50965))
     d.zakaznici.append(Zakaznik(7, 7, 'Marková', 'Jana', 'Kroměříž', 588296, 'Pavlišovská', 4, 76701))
     d.zakaznici.append(Zakaznik(8, 8, 'Veselá', 'Stanislava', 'Židlochovice', 584282, 'Augustova', 66, 43409))
-    d.zakaznici.append(Zakaznik(9, 9, 'Hrubá', 'Štěpánka', 'Lázně Bohdaneč', 574767, 'Hradecká', 663, 66173))
-    d.zakaznici.append(Zakaznik(10, 10, 'Holubová', 'Jaroslava', 'Český Dub', 563960, 'Do Zahrádek Ii', 7, 29852)) 
-    d.zakaznici.append(Zakaznik(11, 11, 'Vávra', 'Norbert', 'Špindlerův Mlýn', 579742, 'Pod Srázem', 225, 49627))  
-    d.zakaznici.append(Zakaznik(12, 12, 'Kašpar', 'Štefan', 'Kravaře', 561720, 'K Otočce', 401, 78842))
-    d.zakaznici.append(Zakaznik(13, 13, 'Jarošová', 'Irena', 'Lipník nad Bečvou', 514705, 'Vraňanská', 5, 66007))  
-    d.zakaznici.append(Zakaznik(14, 14, 'Sedláčková', 'Blanka', 'Cvikov', 561479, 'Vizovická', 2, 17772))
-    d.zakaznici.append(Zakaznik(15, 15, 'Vávrová', 'Libuše', 'Rudolfov', 544981, 'Boční I', 6, 71038))
-    d.zakaznici.append(Zakaznik(16, 16, 'Musil', 'Miroslav', 'Liběchov', 535001, 'Pod Výšinkou', 272, 19205))      
-    d.zakaznici.append(Zakaznik(17, 17, 'Macháček', 'Milan', 'Černovice', 581500, 'Nedvědovo Náměstí', 668, 58359))
-    d.zakaznici.append(Zakaznik(18, 18, 'Kučera', 'Miloslav', 'Králíky', 570192, 'Doubická', 1, 13272))
     d.zakaznici.append(Zakaznik(9, 9, 'Slavík', 'Otakar', 'Neveklov', 530310, 'Kukelská', 8, 21748))
     d.zakaznici.append(Zakaznik(10, 10, 'Strnad', 'Blahoslav', 'Slatiňany', 572268, 'V Závitu', 8, 51833))
     d.zakaznici.append(Zakaznik(11, 11, 'Tůmová', 'Květoslava', 'Stod', 558389, 'Javornická', 6, 12827))
@@ -465,10 +465,11 @@ def main():
     d.zapis_do_csv_souboru('klic;spisovatel_id;prijmeni;jmeno', d.spisovatele, 'spisovatele.txt')
     d.zapis_do_csv_souboru('klic;nakladatel_id;nazev', d.nakladatele, 'nakladatele.txt')
     d.zapis_do_csv_souboru('klic;kategorie_id;oznaceni', d.kategorie, 'kategorie.txt')
-    d.zapis_do_csv_souboru('klic;kniha_id;spisovatel_id;nazev;rok_vydani; cena', d.knihy, 'knihy.txt')
+    d.zapis_do_csv_souboru('klic;kniha_id;spisovatel_id;nakladatel_id;kategorie_id;nazev;rok_vydani;cena', d.knihy, 'knihy.txt')
     d.zapis_do_csv_souboru('klic;kod;kniha_id;nakoupeni;prodani', d.exemplare, 'exemplare.txt')
     d.zapis_do_csv_souboru('klic;datum_naskladneni_klic;exemplar_id;zamestnanec_id;cena', d.nakupy, 'nakupy.txt')
     d.zapis_do_csv_souboru('klic;datum_prodeje_klic;exemplar_id;zakaznik_id;zamestnanec_id;cena', d.prodeje, 'prodeje.txt')
+    d.zapis_do_csv_souboru('klic;datum_id;datum;rok;mesic_cislo;mesic_oznaceni;ctvrtleti_cislo;ctvrtleti_oznaceni;rok_mesic;rok_ctvrtleti', d.datumy, 'datumy.txt')
 
     logging.info('Ukončení skriptu')
 
