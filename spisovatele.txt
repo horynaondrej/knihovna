@@ -1,5 +1,0 @@
-klic;spisovatel_id;prijmeni;jmeno
-1;1;Novák;Jan
-2;2;Svoboda;Petr
-3;3;Malý;Jiří
-4;4;Zelený;Karel
