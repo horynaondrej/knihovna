@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import logging
+import os
 from faker import Faker
 
 
@@ -6265,7 +6266,7 @@ MESTO_KOD = [
     ['Županovice', 26301, 564338]
 ]
 
-def rozdeleni_adresy(arg: str) -> list():
+def rozdeleni_adresy(arg: str) -> list:
     # Funkce slouží pro rozdělení adresy 
     # z knihovny Faker
     if len(arg) == 0:
@@ -6274,7 +6275,7 @@ def rozdeleni_adresy(arg: str) -> list():
     if len(arg) >= 1:
         return list(arg.replace('\n', ' ').split(' '))
 
-def usporadani_adresy(arg: list()) -> list():
+def usporadani_adresy(arg: list) -> list:
     # Funkce slouží pro uspořádání položek adresy
     if len(arg) == 0:
         return list(None)
@@ -6292,7 +6293,7 @@ def usporadani_adresy(arg: list()) -> list():
                 ulice = cislo = psc = mesto = None
         return list([mesto, ulice, cislo, psc])
 
-def doplneni_kodu_mesta(arg: list()) -> list():
+def doplneni_kodu_mesta(arg: list) -> list:
     # Funkce doplní k městům kód města pro 
     # doplnění gps souřadnic
     res = arg
@@ -6306,6 +6307,42 @@ def doplneni_kodu_mesta(arg: list()) -> list():
         res.insert(1, 0)
     return res
 
+def smazani_vystupniho_souboru() -> None:
+    """ Metoda smaže původní soubor s příkazy 
+    pro získání nových sloupců
+    """
+    cesta = os.path.dirname(__file__)
+    vystup = os.path.join(cesta, 'zakaznici-gen.txt')
+    with open(vystup, 'w', encoding='utf8') as v:
+        v.close
+
+def ulozeni_do_souboru(dopl: list) -> None:
+    """ Zápis dat do souboru s omezením na počet řádek
+
+    Args:
+        vystup: cesta k výstupnímu souboru
+        obsah: data k zapsání
+    """
+    cesta = os.path.dirname(__file__)
+    vystup = os.path.join(cesta, 'zakaznici-gen.txt')
+    try:
+        with open(vystup, 'a', encoding='utf8') as soubor_vystup:
+            soubor_vystup.write(
+                'd.zakaznici.append(Zakaznik(' 
+                + str(dopl[0]) + ', '
+                + str(dopl[1]) + ', '
+                + '\'' + str(dopl[2]) + '\', '
+                + '\'' + str(dopl[3]) + '\', '
+                + '\'' + str(dopl[4]) + '\', '
+                + str(dopl[5]) + ', '
+                + '\'' + str(dopl[6]) + '\', '
+                + str(dopl[7]) + ', '
+                + str(dopl[8]) + '))\n')
+            soubor_vystup.close()
+            logging.info('Upravená data zapsaná')
+    except IOError:
+        logging.info('Nezdařilo se zapsat do souboru')
+
 # Hlavní metoda skriptu
 def main():
 
@@ -6318,7 +6355,7 @@ def main():
 
     klic = 9
 
-    for i in range(10):
+    for i in range(100):
         jmeno = fake.name().split(' ')
         # print(jmeno)
         # print(fake.company()) 
@@ -6355,8 +6392,9 @@ def main():
             + str(dopl[8]) + '))'
         )
 
-        klic += 1
+        ulozeni_do_souboru(dopl)
 
+        klic += 1
 
     logging.info('Ukončení skriptu')
 

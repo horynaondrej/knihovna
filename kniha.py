@@ -7,7 +7,9 @@ class Kniha:
             self, 
             klic, 
             kniha_id, 
-            spisovatel_id, 
+            spisovatel_id,
+            nakladatel_id, 
+            kategorie_id, 
             nazev, 
             rok_vydani,
             cena
@@ -15,6 +17,8 @@ class Kniha:
         self.klic = klic
         self.kniha_id = kniha_id
         self.spisovatel_id = spisovatel_id
+        self.nakladatel_id = nakladatel_id
+        self.kategorie_id = kategorie_id
         self.nazev = nazev
         self.rok_vydani = rok_vydani
         self.cena = cena
@@ -24,6 +28,8 @@ class Kniha:
             '(' + str(self.klic) + ', ' \
             + str(self.kniha_id) + ', ' \
             + str(self.spisovatel_id) + ', ' \
+            + str(self.nakladatel_id) + ', ' \
+            + str(self.kategorie_id) + ', ' \
             +  '\'' + self.nazev + '\', ' \
             + str(self.rok_vydani) + '\', ' \
             + str(self.cena) + ')'
@@ -34,6 +40,8 @@ class Kniha:
             str(self.klic) + ';' \
             + str(self.kniha_id) + ';' \
             + str(self.spisovatel_id) + ';' \
+            + str(self.nakladatel_id) + ';' \
+            + str(self.kategorie_id) + ';' \
             + self.nazev + ';' \
             + str(self.rok_vydani) + ';' \
             + str(self.cena)
