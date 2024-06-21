@@ -1,3 +1,0 @@
-klic;zamestnanec_id;prijmeni;jmeno
-1;1;Kouba;František
-2;2;Pokorná;Simona
