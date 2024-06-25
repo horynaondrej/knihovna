@@ -15,14 +15,14 @@ class Zakaznik:
     def format_sql(self):
         return (
             '(' + str(self.klic) + ', ' \
-            + '\'' + str(self.zakaznik_id) + '\', '
+            + str(self.zakaznik_id) + ', '
             + '\'' + self.prijmeni + '\', '
-            + '\'' + self.jmeno + '\','
-            + '\'' + self.mesto + '\','
-            + '' + str(self.mesto_kod) + ','
-            + '\'' + self.ulice + '\','
-            + '' + str(self.cislo) + ','
-            + '' + str(self.psc) + '),'
+            + '\'' + self.jmeno + '\', '
+            + '\'' + self.mesto + '\', '
+            + '' + str(self.mesto_kod) + ', '
+            + '\'' + self.ulice + '\', '
+            + '' + str(self.cislo) + ', '
+            + '' + str(self.psc) + '), '
             )
 
     def format_csv(self):
