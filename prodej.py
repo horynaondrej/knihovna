@@ -29,6 +29,16 @@ class Prodej:
         f'Zaměstnanec ID: {self.zamestnanec_id}, ' \
         f'Cena: {self.cena}'
     
+    def format_sql(self):
+        return (
+            f"({str(self.klic)}, " \
+            f"{str(self.datum_klic)}, " \
+            f"{str(self.exemplar_id)}, " \
+            f"{str(self.zakaznik_id)}, " \
+            f"{str(self.zamestnanec_id)}, " \
+            f"{str(self.cena)}), " \
+            )
+    
     def format_csv(self):
         return (
             str(self.klic) + ';'
@@ -36,5 +46,5 @@ class Prodej:
             + str(self.exemplar_id) + ';'
             + str(self.zakaznik_id) + ';'
             + str(self.zamestnanec_id) + ';'
-            + str(self.cena)
+            + str(self.cena).replace('.', ',')
             )

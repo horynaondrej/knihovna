@@ -45,14 +45,14 @@ class Datum:
     def format_sql(self):
         return (
             '(' + str(self.klic) + ', ' \
-            + '\'' + str(self.datum_id)+ '\', ' \
+            + str(self.datum_id) + ', ' \
             + '\'' + str(self.datum)+ '\', ' \
-            + '\'' + str(self.rok)+ '\', ' \
-            + '\'' + str(self.mesic_cislo)+ '\', ' \
-            + '\'' + str(self.mesic_oznaceni)+ '\', ' \
-            + '\'' + str(self.ctvrtleti_cislo)+ '\', ' \
-            + '\'' + str(self.ctvrtleti_oznaceni)+ '\', ' \
-            + '\'' + str(self.rok_mesic)+ '\', ' \
+            + str(self.rok) + ', ' \
+            + str(self.mesic_cislo) + ', ' \
+            + '\'' + str(self.mesic_oznaceni) + '\', ' \
+            + str(self.ctvrtleti_cislo) + ', ' \
+            + '\'' + str(self.ctvrtleti_oznaceni) + '\', ' \
+            + '\'' + str(self.rok_mesic) + '\', ' \
             + '\'' + str(self.rok_ctvrtleti) + '\'),' 
             )
 
