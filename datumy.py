@@ -6,7 +6,12 @@ class Datum:
         self.datum_id = datum_id.strftime('%Y%m%d')
 
         # Datum
-        self.datum = datum_id.strftime("%d.%m.%Y")
+
+        # SQLite
+        # self.datum = datum_id.strftime("%d.%m.%Y")
+
+        # MSSQL
+        self.datum = datum_id.strftime("%m/%d/%Y")
 
         # Rok
         self.rok = datum_id.strftime("%Y")
@@ -46,7 +51,8 @@ class Datum:
         return (
             '(' + str(self.klic) + ', ' \
             + str(self.datum_id) + ', ' \
-            + '\'' + str(self.datum)+ '\', ' \
+            # + '\'' + str(self.datum)+ '\', ' \
+            + 'convert(date, \'' + str(self.datum)+ '\', 101), ' \
             + str(self.rok) + ', ' \
             + str(self.mesic_cislo) + ', ' \
             + '\'' + str(self.mesic_oznaceni) + '\', ' \

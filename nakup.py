@@ -32,7 +32,7 @@ class Nakup:
             f"{str(self.datum_klic)}, " \
             f"{str(self.exemplar_id)}, " \
             f"{str(self.zamestnanec_id)}, " \
-            f"{str(self.cena)}), " \
+            f"{str(self.cena)})," \
             )
     
     def format_csv(self):

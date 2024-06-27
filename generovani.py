@@ -42,15 +42,15 @@ class Generovani:
         self.prodej_klic = 1
         self.nakup_klic = 1
         self.exemplar_klic = 1
-        self.prodeje = []
-        self.nakupy = []
-        self.knihy = []
-        self.zamestnanci = []
-        self.spisovatele = []
-        self.zakaznici = []
-        self.nakladatele = []
-        self.kategorie = []
-        self.datumy = []
+        self.prodeje: list[Prodej] = []
+        self.nakupy: list[Nakup] = []
+        self.knihy: list[Kniha] = []
+        self.zamestnanci: list[Zakaznik] = []
+        self.spisovatele: list[Spisovatel] = []
+        self.zakaznici: list[Zakaznik] = []
+        self.nakladatele: list[Nakladatel] = []
+        self.kategorie: list[Kategorie] = []
+        self.datumy: list[Datum] = []
 
         # Datum začátku provozu sklad knih
         self.datum = datetime.date(ROK, MESIC, 1)
@@ -67,18 +67,6 @@ class Generovani:
             for nty in tab:
                 s.write(str(nty.format_csv()) + '\n')
         logging.info(f'Zápis souboru {n} proběhl v pořádku')
-    """
-    def najdi_exemplar(self) -> Exemplar:
-        ''' Funkce pro nalezení exempláře knihy
-
-        Return:
-            Exemplar: obj
-        '''
-        for exemplar in self.exemplare:
-            if exemplar.prodani is None:
-                return exemplar
-        return None
-    """
 
     def najdi_exemplar(self) -> Exemplar:
         ''' Funkce pro nalezení exempláře knihy
@@ -131,7 +119,7 @@ class Generovani:
         else:
             return start, konec
     
-    def generuj_prodej(self, exemplar):
+    def generuj_prodej(self, exemplar: Exemplar) -> Prodej:
         ''' Funkce pro generování záznamu o prodeji
 
         Arg:
@@ -166,7 +154,7 @@ class Generovani:
 
         return prodej
     
-    def generuj_nakup(self):
+    def generuj_nakup(self) -> Exemplar | Prodej:
         ''' Funkce pro generování záznamu o nákupu
         '''
 
@@ -284,6 +272,7 @@ class Generovani:
             print(f'Koncové datum: {self.datum}')
             # Když je datum dnes, ukonči veškerou činnost
             if self.datum == datetime.date.today():
+                self.datumy.append(Datum(c + 1, datetime.date(2200, 12, 31)))
                 break
 
 # Hlavní metoda skriptu
@@ -492,7 +481,8 @@ def main():
         g.datumy,
         g.exemplare
         )
-            
+    
+    """
     d1 = 'drop table if exists zakaznici;'
     d2 = 'drop table if exists zamestnanci;'
     d3 = 'drop table if exists spisovatele;'
@@ -602,7 +592,7 @@ def main():
         + 'foreign key (datum_klic) references nakupy (datum_klic) \n' \
         + ');\n'
 
-    c8 = 'create table zamestnanci (\n' \
+    c8 = 'create table kategorie (\n' \
         + 'klic int not null,\n' \
         + 'kategorie_id int not null,\n' \
         + 'oznaceni text not null,\n' \
@@ -627,6 +617,137 @@ def main():
         + 'foreign key (klic) references nakupy (exemplar_id) \n' \
         + ');\n'
     
+    d.ulozeni_prikazu(c1)
+    d.ulozeni_prikazu(c2)
+    d.ulozeni_prikazu(c3)
+    d.ulozeni_prikazu(c4)
+    d.ulozeni_prikazu(c5)
+    d.ulozeni_prikazu(c6)
+    d.ulozeni_prikazu(c7)
+    d.ulozeni_prikazu(c8)
+    d.ulozeni_prikazu(c9)
+    d.ulozeni_prikazu(c10)
+
+    """
+
+    s1 = 'use knihovna;'
+
+    d.ulozeni_prikazu(s1)
+    d.ulozeni_prikazu('')
+    
+    d1 = 'if object_id(\'dbo.zakaznici\', \'U\') is not null drop table zakaznici;'
+    d2 = 'if object_id(\'dbo.zamestnanci\', \'U\') is not null drop table zamestnanci;'
+    d3 = 'if object_id(\'dbo.spisovatele\', \'U\') is not null drop table spisovatele;'
+    d4 = 'if object_id(\'dbo.knihy\', \'U\') is not null drop table knihy;'
+    d5 = 'if object_id(\'dbo.nakupy\', \'U\') is not null drop table nakupy;'
+    d6 = 'if object_id(\'dbo.prodeje\', \'U\') is not null drop table prodeje;'
+    d7 = 'if object_id(\'dbo.datumy\', \'U\') is not null drop table datumy;'
+    d8 = 'if object_id(\'dbo.exemplare\', \'U\') is not null drop table exemplare;'
+    d9 = 'if object_id(\'dbo.nakladatele\', \'U\') is not null drop table nakladatele;'
+    d10 = 'if object_id(\'dbo.kategorie\', \'U\') is not null drop table kategorie;'
+    dx = ''
+
+    d.ulozeni_prikazu(d1)
+    d.ulozeni_prikazu(d2)
+    d.ulozeni_prikazu(d3)
+    d.ulozeni_prikazu(d4)
+    d.ulozeni_prikazu(d5)
+    d.ulozeni_prikazu(d6)
+    d.ulozeni_prikazu(d7)
+    d.ulozeni_prikazu(d8)
+    d.ulozeni_prikazu(d9)
+    d.ulozeni_prikazu(d10)
+    d.ulozeni_prikazu(dx)
+
+    logging.info('Zapsány příkazy DROP')
+
+    c1 = 'create table zakaznici (\n' \
+        + 'klic int not null,\n' \
+        + 'zakaznik_id int not null,\n' \
+        + 'prijmeni varchar(64) not null,\n' \
+        + 'jmeno varchar(64),\n' \
+        + 'mesto varchar(64),\n' \
+        + 'mesto_kod int,\n' \
+        + 'ulice varchar(64),\n' \
+        + 'cislo int,\n' \
+        + 'psc int\n' \
+        + ');\n'
+
+    c2 = 'create table zamestnanci (\n' \
+        + 'klic int not null,\n' \
+        + 'zamestnanec_id int not null,\n' \
+        + 'prijmeni varchar(64) not null,\n' \
+        + 'jmeno varchar(64)\n' \
+        + ');\n'
+
+    c3 = 'create table spisovatele (\n' \
+        + 'klic int not null,\n' \
+        + 'spisovatel_id int not null,\n' \
+        + 'prijmeni varchar(64) not null,\n' \
+        + 'jmeno varchar(64)\n' \
+        + ');\n'
+
+    c4 = 'create table knihy (\n' \
+        + 'klic int not null,\n' \
+        + 'kniha_id int not null,\n' \
+        + 'spisovatel_id int not null,\n' \
+        + 'nakladatel_id int not null,\n' \
+        + 'kategorie_id int not null,\n' \
+        + 'nazev varchar(64) not null,\n' \
+        + 'rok_vydani int not null,\n' \
+        + 'cena int not null\n' \
+        + ');\n'
+
+    c5 = 'create table nakupy (\n' \
+        + 'klic int not null,\n' \
+        + 'datum_klic int not null,\n' \
+        + 'exemplar_id int not null,\n' \
+        + 'zamestnanec_id int not null,\n' \
+        + 'cena numeric(8, 1) not null\n' \
+        + ');\n' 
+
+    c6 = 'create table prodeje (\n' \
+        + 'klic int not null,\n' \
+        + 'datum_klic int not null, \n' \
+        + 'exemplar_id int not null, \n' \
+        + 'zakaznik_id int not null,\n' \
+        + 'zamestnanec_id int not null, \n' \
+        + 'cena numeric(8, 1) not null,\n' \
+        + ');\n'
+
+    c7 = 'create table datumy (\n' \
+        + 'klic int not null,\n' \
+        + 'datum_klic int not null,\n' \
+        + 'datum datetime not null,\n' \
+        + 'rok int not null,\n' \
+        + 'mesic_cislo int not null,\n' \
+        + 'mesic_oznaceni varchar(64) not null,\n' \
+        + 'ctvrtleti_cislo int not null,\n' \
+        + 'ctvrtleti_oznaceni varchar(64) not null,\n' \
+        + 'rok_mesic varchar(64) not null,\n' \
+        + 'rok_ctvrtleti varchar(64) not null\n' \
+        + ');\n'
+    
+    c8 = 'create table kategorie (\n' \
+        + 'klic int not null,\n' \
+        + 'kategorie_id int not null,\n' \
+        + 'oznaceni varchar(64) not null,\n' \
+        + ');\n'
+    
+    c9 = 'create table nakladatele (\n' \
+        + 'klic int not null,\n' \
+        + 'nakladatel_id int not null,\n' \
+        + 'oznaceni varchar(64) not null,\n' \
+        + ');\n'
+    
+    c10 = 'create table exemplare (\n' \
+        + 'klic int not null,\n' \
+        + 'kod varchar(64) not null,\n' \
+        + 'kniha_id int not null,\n' \
+        + 'nakoupeni int not null,\n' \
+        + 'prodani int not null,\n' \
+        + ');\n'
+
     d.ulozeni_prikazu(c1)
     d.ulozeni_prikazu(c2)
     d.ulozeni_prikazu(c3)

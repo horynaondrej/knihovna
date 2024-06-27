@@ -25,7 +25,7 @@ class Exemplar:
             +  '\'' + str(self.kod) + '\', ' \
             + str(self.kniha_id) + ', ' \
             + str(self.nakoupeni) + ', ' \
-            + str(self.prodani if self.prodani is not None else 'null') + '),'
+            + str(self.prodani if self.prodani is not None else '22001231') + '),'
             )
 
     def format_csv(self):
@@ -34,6 +34,6 @@ class Exemplar:
             + str(self.kod) + ';'
             + str(self.kniha_id) + ';'
             + str(self.nakoupeni) + ';'
-            + str(self.prodani if self.prodani is not None else '')
+            + str(self.prodani if self.prodani is not None else '22001231')
             )
     

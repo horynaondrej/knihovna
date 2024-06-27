@@ -22,7 +22,7 @@ class Zakaznik:
             + '' + str(self.mesto_kod) + ', '
             + '\'' + self.ulice + '\', '
             + '' + str(self.cislo) + ', '
-            + '' + str(self.psc) + '), '
+            + '' + str(self.psc) + '),'
             )
 
     def format_csv(self):
