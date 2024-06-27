@@ -31,8 +31,8 @@ class Kniha:
             + str(self.nakladatel_id) + ', ' \
             + str(self.kategorie_id) + ', ' \
             +  '\'' + self.nazev + '\', ' \
-            + str(self.rok_vydani) + '\', ' \
-            + str(self.cena) + ')'
+            + str(self.rok_vydani) + ', ' \
+            + str(self.cena) + '),'
             )
 
     def format_csv(self):
