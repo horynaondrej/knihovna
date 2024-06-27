@@ -173,6 +173,7 @@ class Generovani:
         # Nový exemplář
         exemplar = Exemplar(
                 self.exemplar_klic, 
+                self.exemplar_klic, 
                 kod, 
                 kniha_id_temp,
                 datum_nakupu.strftime('%Y%m%d'), 
@@ -462,9 +463,9 @@ def main():
     g.zapis_do_csv_souboru('klic;nakladatel_id;nazev', g.nakladatele, 'nakladatele.txt')
     g.zapis_do_csv_souboru('klic;kategorie_id;oznaceni', g.kategorie, 'kategorie.txt')
     g.zapis_do_csv_souboru('klic;kniha_id;spisovatel_id;nakladatel_id;kategorie_id;nazev;rok_vydani;cena', g.knihy, 'knihy.txt')
-    g.zapis_do_csv_souboru('klic;kod;kniha_id;nakoupeni;prodani', g.exemplare, 'exemplare.txt')
-    g.zapis_do_csv_souboru('klic;datum_naskladneni_klic;exemplar_id;zamestnanec_id;cena', g.nakupy, 'nakupy.txt')
-    g.zapis_do_csv_souboru('klic;datum_prodeje_klic;exemplar_id;zakaznik_id;zamestnanec_id;cena', g.prodeje, 'prodeje.txt')
+    g.zapis_do_csv_souboru('klic;exemplar_id;kod;kniha_id;nakoupeni;prodani', g.exemplare, 'exemplare.txt')
+    g.zapis_do_csv_souboru('klic;datum_klic;exemplar_id;zamestnanec_id;cena', g.nakupy, 'nakupy.txt')
+    g.zapis_do_csv_souboru('klic;datum_klic;exemplar_id;zakaznik_id;zamestnanec_id;cena', g.prodeje, 'prodeje.txt')
     g.zapis_do_csv_souboru('klic;datum_id;datum;rok;mesic_cislo;mesic_oznaceni;ctvrtleti_cislo;ctvrtleti_oznaceni;rok_mesic;rok_ctvrtleti', g.datumy, 'datumy.txt')
 
     d = Databaze()
@@ -635,16 +636,16 @@ def main():
     d.ulozeni_prikazu(s1)
     d.ulozeni_prikazu('')
     
-    d1 = 'if object_id(\'dbo.zakaznici\', \'U\') is not null drop table zakaznici;'
-    d2 = 'if object_id(\'dbo.zamestnanci\', \'U\') is not null drop table zamestnanci;'
-    d3 = 'if object_id(\'dbo.spisovatele\', \'U\') is not null drop table spisovatele;'
-    d4 = 'if object_id(\'dbo.knihy\', \'U\') is not null drop table knihy;'
-    d5 = 'if object_id(\'dbo.nakupy\', \'U\') is not null drop table nakupy;'
-    d6 = 'if object_id(\'dbo.prodeje\', \'U\') is not null drop table prodeje;'
-    d7 = 'if object_id(\'dbo.datumy\', \'U\') is not null drop table datumy;'
-    d8 = 'if object_id(\'dbo.exemplare\', \'U\') is not null drop table exemplare;'
-    d9 = 'if object_id(\'dbo.nakladatele\', \'U\') is not null drop table nakladatele;'
-    d10 = 'if object_id(\'dbo.kategorie\', \'U\') is not null drop table kategorie;'
+    d1 = 'if object_id(\'dbo.zakaznici\', \'U\') is not null drop table dbo.zakaznici;'
+    d2 = 'if object_id(\'dbo.zamestnanci\', \'U\') is not null drop table dbo.zamestnanci;'
+    d3 = 'if object_id(\'dbo.spisovatele\', \'U\') is not null drop table dbo.spisovatele;'
+    d4 = 'if object_id(\'dbo.knihy\', \'U\') is not null drop table dbo.knihy;'
+    d5 = 'if object_id(\'dbo.nakupy\', \'U\') is not null drop table dbo.nakupy;'
+    d6 = 'if object_id(\'dbo.prodeje\', \'U\') is not null drop table dbo.prodeje;'
+    d7 = 'if object_id(\'dbo.datumy\', \'U\') is not null drop table dbo.datumy;'
+    d8 = 'if object_id(\'dbo.exemplare\', \'U\') is not null drop table dbo.exemplare;'
+    d9 = 'if object_id(\'dbo.nakladatele\', \'U\') is not null drop table dbo.nakladatele;'
+    d10 = 'if object_id(\'dbo.kategorie\', \'U\') is not null drop table dbo.kategorie;'
     dx = ''
 
     d.ulozeni_prikazu(d1)
@@ -700,7 +701,7 @@ def main():
 
     c5 = 'create table nakupy (\n' \
         + 'klic int not null,\n' \
-        + 'datum_klic int not null,\n' \
+        + 'datum_id int not null,\n' \
         + 'exemplar_id int not null,\n' \
         + 'zamestnanec_id int not null,\n' \
         + 'cena numeric(8, 1) not null\n' \
@@ -708,7 +709,7 @@ def main():
 
     c6 = 'create table prodeje (\n' \
         + 'klic int not null,\n' \
-        + 'datum_klic int not null, \n' \
+        + 'datum_id int not null, \n' \
         + 'exemplar_id int not null, \n' \
         + 'zakaznik_id int not null,\n' \
         + 'zamestnanec_id int not null, \n' \
@@ -717,7 +718,7 @@ def main():
 
     c7 = 'create table datumy (\n' \
         + 'klic int not null,\n' \
-        + 'datum_klic int not null,\n' \
+        + 'datum_id int not null,\n' \
         + 'datum datetime not null,\n' \
         + 'rok int not null,\n' \
         + 'mesic_cislo int not null,\n' \
@@ -742,6 +743,7 @@ def main():
     
     c10 = 'create table exemplare (\n' \
         + 'klic int not null,\n' \
+        + 'exemplar_id int not null,\n' \
         + 'kod varchar(64) not null,\n' \
         + 'kniha_id int not null,\n' \
         + 'nakoupeni int not null,\n' \
@@ -777,16 +779,16 @@ def main():
     d.ulozeni_prikazu(i4)
     d.ulozeni_tabulky(d.knihy)
 
-    i5 = 'insert into nakupy (klic, datum_klic, exemplar_id, zamestnanec_id, cena) values '
+    i5 = 'insert into nakupy (klic, datum_id, exemplar_id, zamestnanec_id, cena) values '
     d.ulozeni_rozsahle_tabulky(d.nakupy, i5)
 
-    i6 = 'insert into prodeje (klic, datum_klic, exemplar_id, zakaznik_id, zamestnanec_id, cena) values '
+    i6 = 'insert into prodeje (klic, datum_id, exemplar_id, zakaznik_id, zamestnanec_id, cena) values '
     d.ulozeni_rozsahle_tabulky(d.prodeje, i6)
 
-    i10 = 'insert into exemplare (klic, kod, kniha_id, nakoupeni, prodani) values '
+    i10 = 'insert into exemplare (klic, exemplar_id, kod, kniha_id, nakoupeni, prodani) values '
     d.ulozeni_rozsahle_tabulky(d.exemplare, i10)
 
-    i7 = 'insert into datumy (klic, datum_klic, datum, rok, mesic_cislo, mesic_oznaceni, ctvrtleti_cislo, ctvrtleti_oznaceni, rok_mesic, rok_ctvrtleti) values '
+    i7 = 'insert into datumy (klic, datum_id, datum, rok, mesic_cislo, mesic_oznaceni, ctvrtleti_cislo, ctvrtleti_oznaceni, rok_mesic, rok_ctvrtleti) values '
     d.ulozeni_rozsahle_tabulky(d.datumy, i7)
 
     i8 = 'insert into kategorie (klic, kategorie_id, oznaceni) values '
@@ -798,6 +800,19 @@ def main():
     d.ulozeni_tabulky(d.nakladatele)
     
     logging.info('Zapsány příkazy INSERT')
+
+    prefix = 'v_pbi_knihovna_'
+
+    v1 = f'create view {prefix}exemplare (\n' \
+    + 'klic int not null,\n' \
+    + 'exemplar_id int not null,\n' \
+    + 'kod varchar(64) not null,\n' \
+    + 'kniha_id int not null,\n' \
+    + 'nakoupeni int not null,\n' \
+    + 'prodani int not null,\n' \
+    + ');\n'
+
+    d.ulozeni_prikazu(c1)
 
     logging.info('Ukončení skriptu')
 
