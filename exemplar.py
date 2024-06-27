@@ -7,13 +7,15 @@ class Exemplar:
 
     def __init__(
         self, 
-        klic, 
+        klic,
+        exemplar_id, 
         kod, 
         kniha_id, 
         nakoupeni, 
         prodani
     ):
         self.klic = klic
+        self.exemplar_id = exemplar_id
         self.kod = kod
         self.kniha_id = kniha_id
         self.nakoupeni = nakoupeni
@@ -22,6 +24,7 @@ class Exemplar:
     def format_sql(self):
         return (
             '(' + str(self.klic) + ', ' \
+            + str(self.exemplar_id) + ', ' \
             +  '\'' + str(self.kod) + '\', ' \
             + str(self.kniha_id) + ', ' \
             + str(self.nakoupeni) + ', ' \
@@ -31,6 +34,7 @@ class Exemplar:
     def format_csv(self):
         return (
             str(self.klic) + ';'
+            + str(self.exemplar_id) + ';'
             + str(self.kod) + ';'
             + str(self.kniha_id) + ';'
             + str(self.nakoupeni) + ';'
