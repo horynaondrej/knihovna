@@ -52,6 +52,19 @@ class Generovani:
         self.kategorie: list[Kategorie] = []
         self.datumy: list[Datum] = []
 
+        self.tabulky: list[str] = [
+            'zakaznici',
+            'zamestnanci',
+            'spisovatele',
+            'knihy',
+            'nakupy',
+            'prodeje',
+            'datumy',
+            'kategorie',
+            'nakladatele',
+            'exemplare'
+            ]
+
         # Datum začátku provozu sklad knih
         self.datum = datetime.date(ROK, MESIC, 1)
 
@@ -276,6 +289,27 @@ class Generovani:
                 self.datumy.append(Datum(c + 1, datetime.date(2200, 12, 31)))
                 break
 
+    def vytvoreni_views(self, tabulka: str) -> str | str:
+        """ Funkce přidá do SQL příkazu příkazy
+        pro vytvoření views nad všemi stávajícími tabulkami
+
+        Args:
+            název tabulky: str
+
+        Returns: 
+            příkaz drop: str
+            příkaz create view: str
+        """
+        prefix = 'v_pbi_knihovna_'
+
+        drop = f"if object_id('dbo.{prefix}{tabulka}', 'v') is not null drop view dbo.{prefix}{tabulka};"
+        create = f"create view {prefix}{tabulka}\n"
+        create += f"as\n"
+        create += f"select * from {tabulka};"
+
+        return drop, create
+
+
 # Hlavní metoda skriptu
 def main():
 
@@ -464,8 +498,8 @@ def main():
     g.zapis_do_csv_souboru('klic;kategorie_id;oznaceni', g.kategorie, 'kategorie.txt')
     g.zapis_do_csv_souboru('klic;kniha_id;spisovatel_id;nakladatel_id;kategorie_id;nazev;rok_vydani;cena', g.knihy, 'knihy.txt')
     g.zapis_do_csv_souboru('klic;exemplar_id;kod;kniha_id;nakoupeni;prodani', g.exemplare, 'exemplare.txt')
-    g.zapis_do_csv_souboru('klic;datum_klic;exemplar_id;zamestnanec_id;cena', g.nakupy, 'nakupy.txt')
-    g.zapis_do_csv_souboru('klic;datum_klic;exemplar_id;zakaznik_id;zamestnanec_id;cena', g.prodeje, 'prodeje.txt')
+    g.zapis_do_csv_souboru('klic;datum_id;exemplar_id;zamestnanec_id;cena', g.nakupy, 'nakupy.txt')
+    g.zapis_do_csv_souboru('klic;datum_id;exemplar_id;zakaznik_id;zamestnanec_id;cena', g.prodeje, 'prodeje.txt')
     g.zapis_do_csv_souboru('klic;datum_id;datum;rok;mesic_cislo;mesic_oznaceni;ctvrtleti_cislo;ctvrtleti_oznaceni;rok_mesic;rok_ctvrtleti', g.datumy, 'datumy.txt')
 
     d = Databaze()
@@ -506,7 +540,6 @@ def main():
     d.ulozeni_prikazu(d9)
     d.ulozeni_prikazu(d10)
     
-
     logging.info('Zapsány příkazy DROP')
 
     c1 = 'create table zakaznici (\n' \
@@ -556,23 +589,23 @@ def main():
 
     c5 = 'create table nakupy (\n' \
         + 'klic int not null,\n' \
-        + 'datum_klic int not null,\n' \
+        + 'datum_id int not null,\n' \
         + 'exemplar_id int not null,\n' \
         + 'zamestnanec_id int not null,\n' \
         + 'cena real not null,\n' \
-        + 'foreign key (datum_klic) references datumy (datum_klic), \n' \
+        + 'foreign key (datum_id) references datumy (datum_id), \n' \
         + 'foreign key (exemplar_id) references exemplare (exemplar_id), \n' \
         + 'foreign key (zamestnanec_id) references zamestnanci (zamestnanec_id) \n' \
         + ');\n' 
 
     c6 = 'create table prodeje (\n' \
         + 'klic int not null,\n' \
-        + 'datum_klic int not null, \n' \
+        + 'datum_id int not null, \n' \
         + 'exemplar_id int not null, \n' \
         + 'zakaznik_id int not null,\n' \
         + 'zamestnanec_id int not null, \n' \
         + 'cena real not null,\n' \
-        + 'foreign key (datum_klic) references datumy (datum_klic), \n' \
+        + 'foreign key (datum_id) references datumy (datum_id), \n' \
         + 'foreign key (exemplar_id) references exemplare (exemplar_id), \n' \
         + 'foreign key (zakaznik_id) references zakaznici (zakaznik_id), \n' \
         + 'foreign key (zamestnanec_id) references zamestnanci (zamestnanec_id) \n' \
@@ -580,7 +613,7 @@ def main():
     
     c7 = 'create table datumy (\n' \
         + 'klic int not null,\n' \
-        + 'datum_klic int not null,\n' \
+        + 'datum_id int not null,\n' \
         + 'datum text not null,\n' \
         + 'rok int not null,\n' \
         + 'mesic_cislo int not null,\n' \
@@ -589,8 +622,8 @@ def main():
         + 'ctvrtleti_oznaceni text not null,\n' \
         + 'rok_mesic text not null,\n' \
         + 'rok_ctvrtleti text not null,\n' \
-        + 'foreign key (datum_klic) references prodeje (datum_klic), \n' \
-        + 'foreign key (datum_klic) references nakupy (datum_klic) \n' \
+        + 'foreign key (datum_id) references prodeje (datum_id), \n' \
+        + 'foreign key (datum_id) references nakupy (datum_id) \n' \
         + ');\n'
 
     c8 = 'create table kategorie (\n' \
@@ -609,13 +642,14 @@ def main():
     
     c10 = 'create table exemplare (\n' \
         + 'klic int not null,\n' \
+        + 'exemplar_id int not null,\n' \
         + 'kod text not null,\n' \
         + 'kniha_id int not null,\n' \
         + 'nakoupeni int not null,\n' \
         + 'prodani int,\n' \
         + 'foreign key (kniha_id) references knihy (kniha_id) \n' \
-        + 'foreign key (klic) references prodeje (exemplar_id), \n' \
-        + 'foreign key (klic) references nakupy (exemplar_id) \n' \
+        + 'foreign key (exemplar_id) references prodeje (exemplar_id), \n' \
+        + 'foreign key (exemplar_id) references nakupy (exemplar_id) \n' \
         + ');\n'
     
     d.ulozeni_prikazu(c1)
@@ -801,18 +835,18 @@ def main():
     
     logging.info('Zapsány příkazy INSERT')
 
-    prefix = 'v_pbi_knihovna_'
-
-    v1 = f'create view {prefix}exemplare (\n' \
-    + 'klic int not null,\n' \
-    + 'exemplar_id int not null,\n' \
-    + 'kod varchar(64) not null,\n' \
-    + 'kniha_id int not null,\n' \
-    + 'nakoupeni int not null,\n' \
-    + 'prodani int not null,\n' \
-    + ');\n'
-
     d.ulozeni_prikazu(c1)
+
+    # Přidání příkazů pro vytvoření views
+    tabulky: list[str] = g.tabulky
+
+    # Mezi příkazy je nutné vložit příkaz GO
+    for ity in tabulky:
+        drop, create = g.vytvoreni_views(ity)
+        d.ulozeni_prikazu('GO')
+        d.ulozeni_prikazu(drop)
+        d.ulozeni_prikazu('GO')
+        d.ulozeni_prikazu(create)
 
     logging.info('Ukončení skriptu')
 
