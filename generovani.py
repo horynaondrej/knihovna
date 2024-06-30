@@ -22,8 +22,9 @@ from databaze import Databaze
 """
 MARZE: float = 1.15
 
-ROK = 2024
-MESIC = 6
+ROK = 2023
+MESIC = 1
+DEN = 1
 
 VAHA_ZACATEK = 500
 VAHA_KONEC = 1000
@@ -66,7 +67,7 @@ class Generovani:
             ]
 
         # Datum začátku provozu sklad knih
-        self.datum = datetime.date(ROK, MESIC, 1)
+        self.datum = datetime.date(ROK, MESIC, DEN)
 
     def zapis_do_csv_souboru(self, hla, tab, n) -> None:
         """ Metoda zapíše data do souboru jako CSV.
@@ -237,6 +238,8 @@ class Generovani:
         while True:
 
             self.datumy.append(Datum(c + 1, self.datum))
+
+            self.datum = self.datum + datetime.timedelta(days=1)
         
             # Provádí n počet prodejů
             i = 0
@@ -280,13 +283,13 @@ class Generovani:
 
             print(f'Počet nákupů: {pocet_nakupu : <10}')
 
-            self.datum = self.datum + datetime.timedelta(days=1)
             c += 1
 
             print(f'Koncové datum: {self.datum}')
             # Když je datum dnes, ukonči veškerou činnost
             if self.datum == datetime.date.today():
-                self.datumy.append(Datum(c + 1, datetime.date(2200, 12, 31)))
+                self.datumy.append(Datum(c + 1, self.datum))
+                self.datumy.append(Datum(c + 2, datetime.date(2200, 12, 31)))
                 break
 
     def vytvoreni_views(self, tabulka: str) -> str | str:
@@ -665,10 +668,9 @@ def main():
 
     """
 
-    s1 = 'use knihovna;'
+    s1 = 'use knihovna;\nGO'
 
     d.ulozeni_prikazu(s1)
-    d.ulozeni_prikazu('')
     
     d1 = 'if object_id(\'dbo.zakaznici\', \'U\') is not null drop table dbo.zakaznici;'
     d2 = 'if object_id(\'dbo.zamestnanci\', \'U\') is not null drop table dbo.zamestnanci;'
@@ -679,8 +681,7 @@ def main():
     d7 = 'if object_id(\'dbo.datumy\', \'U\') is not null drop table dbo.datumy;'
     d8 = 'if object_id(\'dbo.exemplare\', \'U\') is not null drop table dbo.exemplare;'
     d9 = 'if object_id(\'dbo.nakladatele\', \'U\') is not null drop table dbo.nakladatele;'
-    d10 = 'if object_id(\'dbo.kategorie\', \'U\') is not null drop table dbo.kategorie;'
-    dx = ''
+    d10 = 'if object_id(\'dbo.kategorie\', \'U\') is not null drop table dbo.kategorie;\nGO'
 
     d.ulozeni_prikazu(d1)
     d.ulozeni_prikazu(d2)
@@ -692,7 +693,6 @@ def main():
     d.ulozeni_prikazu(d8)
     d.ulozeni_prikazu(d9)
     d.ulozeni_prikazu(d10)
-    d.ulozeni_prikazu(dx)
 
     logging.info('Zapsány příkazy DROP')
 
@@ -706,21 +706,21 @@ def main():
         + 'ulice varchar(64),\n' \
         + 'cislo int,\n' \
         + 'psc int\n' \
-        + ');\n'
+        + ');\nGO'
 
     c2 = 'create table zamestnanci (\n' \
         + 'klic int not null,\n' \
         + 'zamestnanec_id int not null,\n' \
         + 'prijmeni varchar(64) not null,\n' \
         + 'jmeno varchar(64)\n' \
-        + ');\n'
+        + ');\nGO'
 
     c3 = 'create table spisovatele (\n' \
         + 'klic int not null,\n' \
         + 'spisovatel_id int not null,\n' \
         + 'prijmeni varchar(64) not null,\n' \
         + 'jmeno varchar(64)\n' \
-        + ');\n'
+        + ');\nGO'
 
     c4 = 'create table knihy (\n' \
         + 'klic int not null,\n' \
@@ -731,7 +731,7 @@ def main():
         + 'nazev varchar(64) not null,\n' \
         + 'rok_vydani int not null,\n' \
         + 'cena int not null\n' \
-        + ');\n'
+        + ');\nGO'
 
     c5 = 'create table nakupy (\n' \
         + 'klic int not null,\n' \
@@ -748,7 +748,7 @@ def main():
         + 'zakaznik_id int not null,\n' \
         + 'zamestnanec_id int not null, \n' \
         + 'cena numeric(8, 1) not null,\n' \
-        + ');\n'
+        + ');\nGO'
 
     c7 = 'create table datumy (\n' \
         + 'klic int not null,\n' \
@@ -761,19 +761,19 @@ def main():
         + 'ctvrtleti_oznaceni varchar(64) not null,\n' \
         + 'rok_mesic varchar(64) not null,\n' \
         + 'rok_ctvrtleti varchar(64) not null\n' \
-        + ');\n'
+        + ');\nGO'
     
     c8 = 'create table kategorie (\n' \
         + 'klic int not null,\n' \
         + 'kategorie_id int not null,\n' \
         + 'oznaceni varchar(64) not null,\n' \
-        + ');\n'
+        + ');\nGO'
     
     c9 = 'create table nakladatele (\n' \
         + 'klic int not null,\n' \
         + 'nakladatel_id int not null,\n' \
         + 'oznaceni varchar(64) not null,\n' \
-        + ');\n'
+        + ');\nGO'
     
     c10 = 'create table exemplare (\n' \
         + 'klic int not null,\n' \
@@ -782,7 +782,7 @@ def main():
         + 'kniha_id int not null,\n' \
         + 'nakoupeni int not null,\n' \
         + 'prodani int not null,\n' \
-        + ');\n'
+        + ');\nGO'
 
     d.ulozeni_prikazu(c1)
     d.ulozeni_prikazu(c2)
@@ -835,18 +835,16 @@ def main():
     
     logging.info('Zapsány příkazy INSERT')
 
-    d.ulozeni_prikazu(c1)
-
     # Přidání příkazů pro vytvoření views
     tabulky: list[str] = g.tabulky
 
     # Mezi příkazy je nutné vložit příkaz GO
     for ity in tabulky:
         drop, create = g.vytvoreni_views(ity)
-        d.ulozeni_prikazu('GO')
         d.ulozeni_prikazu(drop)
         d.ulozeni_prikazu('GO')
         d.ulozeni_prikazu(create)
+        d.ulozeni_prikazu('GO')
 
     logging.info('Ukončení skriptu')
 

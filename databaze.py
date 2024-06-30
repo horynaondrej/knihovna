@@ -6,7 +6,7 @@ class Databaze:
 
     def __init__(self) -> None:
         self.cesta = os.path.dirname(__file__)
-        self.nazev = os.path.join(self.cesta, 'prikaz.txt')
+        self.nazev = os.path.join(self.cesta, 'prikaz.sql')
 
         self.prodeje = []
         self.nakupy = []
@@ -77,7 +77,7 @@ class Databaze:
                     temp += str(i.format_sql()).replace('\'null\'', 'null') + '\n'
                     res = temp[:-2] + ';' 
                 s.write(res)
-                s.write('\n\n')
+                s.write('\nGO\n')
         except FileNotFoundError:
             logging.info('Soubor se nepodařilo uložit')
 
@@ -94,6 +94,6 @@ class Databaze:
                         temp += str(j.format_sql()) + '\n'
                     res = temp[:-2] + ';' 
                     s.write(res)
-                    s.write('\n\n')
+                    s.write('\nGO\n')
         except FileNotFoundError:
             logging.info('Soubor se nepodařilo uložit')
