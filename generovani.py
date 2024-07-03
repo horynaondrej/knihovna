@@ -26,8 +26,8 @@ ROK = 2023
 MESIC = 1
 DEN = 1
 
-VAHA_ZACATEK = 500
-VAHA_KONEC = 1000
+VAHA_ZACATEK = 50
+VAHA_KONEC = 100
 
 
 class Generovani:
@@ -65,6 +65,20 @@ class Generovani:
             'nakladatele',
             'exemplare'
             ]
+        
+        self.sloupce = {
+            'zakaznici': 'klic;zakaznik_id;prijmeni;jmeno;mesto;mesto_kod;ulice;cislo;psc',
+            'zamestnanci': 'klic;zamestnanec_id;prijmeni;jmeno',
+            'spisovatele': 'klic;spisovatel_id;prijmeni;jmeno',
+            'knihy': 'klic;kniha_id;spisovatel_id;nakladatel_id;kategorie_id;nazev;rok_vydani;cena',
+            'nakupy': 'klic;datum_id;exemplar_id;zamestnanec_id;cena',
+            'prodeje': 'klic;datum_id;exemplar_id;zakaznik_id;zamestnanec_id;cena',
+            'datumy': 'klic;datum_id;datum;rok;mesic_cislo;mesic_oznaceni;ctvrtleti_cislo;ctvrtleti_oznaceni;rok_mesic;rok_ctvrtleti',
+            'kategorie': 'klic;kategorie_id;oznaceni',
+            'nakladatele': 'klic;nakladatel_id;oznaceni',
+            'exemplare': 'klic;exemplar_id;kod;kniha_id;nakoupeni;prodani'
+        }
+    
 
         # Datum začátku provozu sklad knih
         self.datum = datetime.date(ROK, MESIC, DEN)
@@ -304,11 +318,19 @@ class Generovani:
             příkaz create view: str
         """
         prefix = 'v_pbi_knihovna_'
+        sloupce: list[str] = self.sloupce[tabulka].split(';')
 
         drop = f"if object_id('dbo.{prefix}{tabulka}', 'v') is not null drop view dbo.{prefix}{tabulka};"
         create = f"create view {prefix}{tabulka}\n"
         create += f"as\n"
-        create += f"select * from {tabulka};"
+        create += f"select \n"
+        for ity, hod in enumerate(sloupce):
+            if ity == 0:
+                create += f"{tabulka}.{hod} as {hod}\n"
+            else:
+                create += f",{tabulka}.{hod} as {hod}\n"
+        # plus ještě \n
+        create += f"from {tabulka};"
 
         return drop, create
 
@@ -497,7 +519,7 @@ def main():
     g.zapis_do_csv_souboru('klic;zakaznik_id;prijmeni;jmeno;mesto;mesto_kod;ulice;cislo;psc', g.zakaznici, 'zakaznici.txt')
     g.zapis_do_csv_souboru('klic;zamestnanec_id;prijmeni;jmeno', g.zamestnanci, 'zamestnanci.txt')
     g.zapis_do_csv_souboru('klic;spisovatel_id;prijmeni;jmeno', g.spisovatele, 'spisovatele.txt')
-    g.zapis_do_csv_souboru('klic;nakladatel_id;nazev', g.nakladatele, 'nakladatele.txt')
+    g.zapis_do_csv_souboru('klic;nakladatel_id;oznaceni', g.nakladatele, 'nakladatele.txt')
     g.zapis_do_csv_souboru('klic;kategorie_id;oznaceni', g.kategorie, 'kategorie.txt')
     g.zapis_do_csv_souboru('klic;kniha_id;spisovatel_id;nakladatel_id;kategorie_id;nazev;rok_vydani;cena', g.knihy, 'knihy.txt')
     g.zapis_do_csv_souboru('klic;exemplar_id;kod;kniha_id;nakoupeni;prodani', g.exemplare, 'exemplare.txt')
